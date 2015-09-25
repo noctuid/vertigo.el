@@ -80,7 +80,7 @@ when asking users to input keys and after the jump."
                                      (int-to-string (1+ delayed-index)))))
                (final-index (-elem-index second-char vertigo-home-row))
                (jump-lines (when final-index
-                             (string-to-int
+                             (string-to-number
                               (concat (int-to-string (1+ delayed-index))
                                       (int-to-string (if (= final-index 9)
                                                          0
