@@ -79,12 +79,13 @@ when asking users to input keys and after the jump."
                              (concat prompt
                                      (int-to-string (1+ delayed-index)))))
                (final-index (-elem-index second-char vertigo-home-row))
-               (jump-lines (when final-index
-                             (string-to-number
-                              (concat (int-to-string (1+ delayed-index))
-                                      (int-to-string (if (= final-index 9)
-                                                         0
-                                                       (1+ final-index))))))))
+               (jump-lines
+                (when final-index
+                  (string-to-number
+                   (concat (number-to-string (1+ delayed-index))
+                           (number-to-string (if (= final-index 9)
+                                                 0
+                                               (1+ final-index))))))))
           (when jump-lines
             (funcall jump-function jump-lines)
             (message (concat prompt (int-to-string jump-lines) " --"))))))))
