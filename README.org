@@ -1,0 +1,13 @@
+* About
+=vertigo.el= is a port of the vim [[https://github.com/prendradjaja/vim-vertigo][vertigo]] plugin and gives commands for jumping up and down by lines using the home row. For example, after pressing a key bound to a vertigo command, the user might press =k=, the 8th letter on the home row, to jump 8 lines. Vertigo is most useful when used with relative line numbering.
+
+Evil is not required.
+* Configuration
+The commands ~vertigo-jump-up~ and ~vertigo-jump-down~ are provided by this package. Neither are bound to keys by default.
+
+For non-QWERTY users, ~vertigo-home-row~ can be changed:
+#+begin_src emacs-lisp
+(setq vertigo-home-row '(?a ?r ?s ?t ?d ?h ?n ?e ?i ?o))
+#+end_src
+
+Since it is inefficient to use these commands to jump one or two lines, vertigo can take a second key as input for some keys. For example, pressing =aa= would jump 11 lines and pressing =a;= would jump 10. To control the max home row key where 2 keys are input, ~vertigo-cut-off~ can be set. It defaults to 3, meaning that 39 lines can be jumped at maximum. Pressing =d(key2)= will jump 30 something lines, but pressing =f= will immediately jump 4 lines.
