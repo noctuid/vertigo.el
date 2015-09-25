@@ -77,7 +77,7 @@ when asking users to input keys and after the jump."
       (when delayed-index
         (let* ((second-char (read-char
                              (concat prompt
-                                     (int-to-string (1+ delayed-index)))))
+                                     (number-to-string (1+ delayed-index)))))
                (final-index (-elem-index second-char vertigo-home-row))
                (jump-lines
                 (when final-index
@@ -88,7 +88,7 @@ when asking users to input keys and after the jump."
                                                (1+ final-index))))))))
           (when jump-lines
             (funcall jump-function jump-lines)
-            (message (concat prompt (int-to-string jump-lines) " --"))))))))
+            (message (concat prompt (number-to-string jump-lines) " --"))))))))
 
 ;;;###autoload
 (defun vertigo-jump-down ()
