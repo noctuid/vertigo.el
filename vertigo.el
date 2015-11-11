@@ -94,11 +94,35 @@ when asking users to input keys and after the jump."
 (defun vertigo-jump-down ()
   "Jump down a number of lines using the home row keys."
   (interactive)
-  (vertigo--jump #'next-line "Jump down: "))
+  (vertigo--jump #'forward-line "Jump down: "))
 
 ;;;###autoload
 (defun vertigo-jump-up ()
   "Jump up a number of lines using the home row keys."
+  (interactive)
+  (vertigo--jump (lambda (count) (forward-line (- count))) "Jump up: "))
+
+;;;###autoload
+(defun vertigo-visible-jump-down ()
+  "Jump down a number of visible lines using the home row keys."
+  (interactive)
+  (vertigo--jump #'forward-visible-line "Jump down: "))
+
+;;;###autoload
+(defun vertigo-visible-jump-up ()
+  "Jump up a number of visible lines using the home row keys."
+  (interactive)
+  (vertigo--jump (lambda (count) (forward-visible-line (- count))) "Jump up: "))
+
+;;;###autoload
+(defun vertigo-visual-jump-down ()
+  "Jump down a number of visual lines using the home row keys."
+  (interactive)
+  (vertigo--jump #'next-line "Jump down: "))
+
+;;;###autoload
+(defun vertigo-visual-jump-up ()
+  "Jump up a number of visual lines using the home row keys."
   (interactive)
   (vertigo--jump #'previous-line "Jump up: "))
 

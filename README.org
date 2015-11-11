@@ -3,7 +3,13 @@
 
 Evil is not required.
 * Configuration
-The commands ~vertigo-jump-up~ and ~vertigo-jump-down~ are provided by this package. Neither are bound to keys by default.
+No keys are bound by default. The following commands are provided:
+
+~vertigo-jump-up~ and ~vertigo-jump-down~ will jump an actual number of lines.
+
+~vertigo-visible-jump-up~ and ~vertigo-visible-jump-down~ will jump a number of visible lines. For example, they will not jump into a folded org heading.
+
+~vertigo-visual-jump-up~ and ~vertigo-visual-jump-down~ will jump a number of visual lines (as in visual-line-mode). They will not jump into invisible text and will consider a soft-wrapped line to count as the number of visual lines it takes up.
 
 For non-QWERTY users, ~vertigo-home-row~ can be changed:
 #+begin_src emacs-lisp
