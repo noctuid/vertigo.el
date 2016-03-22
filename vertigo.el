@@ -1,6 +1,6 @@
 ;;; vertigo.el --- Jump across lines using the home row.
 
-;; Author: Lit Wakefield <noct@openmailbox.org>
+;; Author: Fox Kiester <noct@openmailbox.org>
 ;; URL: https://github.com/noctuid/vertigo.el
 ;; Created: September 18, 2015
 ;; Keywords: vim, vertigo
