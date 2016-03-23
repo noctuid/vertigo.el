@@ -5,7 +5,7 @@
 ;; Created: September 18, 2015
 ;; Keywords: vim, vertigo
 ;; Package-Requires: ((dash "2.11.0"))
-;; Version: 0.1
+;; Version: 1.0
 
 ;; This file is not part of GNU Emacs.
 
