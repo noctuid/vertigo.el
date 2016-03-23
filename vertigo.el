@@ -37,6 +37,9 @@
 
 ;; A good alternative to this package is to use avy's `avy-goto-line'.
 
+;; Additionally, vertigo provides commands to set the digit argument using the
+;; same style of keypresses.
+
 ;; For more information see the README in the github repo.
 
 ;;; Code:
@@ -127,6 +130,30 @@ when asking users to input keys and after the jump."
   "Jump up a number of visual lines using the home row keys."
   (interactive)
   (vertigo--jump #'previous-line "Jump up: "))
+
+(defun vertigo--set-digit-argument (num)
+  "A simpler version of `set-digit-argument'; set `prefix-arg' to NUM."
+  (setq prefix-arg num))
+
+(defun vertigo--set-negative-digit-argument (num)
+  "Set `prefix-arg' to negative NUM."
+  (setq prefix-arg (- num)))
+
+;;;###autoload
+(defun vertigo-set-digit-argument (arg)
+  "Set a positive digit argument using vertigo keys.
+If ARG is non-nil, set a negative count."
+  (interactive "P")
+  (if arg
+      (vertigo--jump #'vertigo--set-negative-digit-argument "Set digit arg: ")
+    (vertigo--jump #'vertigo--set-digit-argument "Set digit arg: ")))
+
+;;;###autoload
+(defun vertigo-set-negative-digit-argument (arg)
+  "Set a negative digit argument using vertigo keys.
+If ARG is non-nil, set a positive count."
+  (interactive "P")
+  (vertigo-set-digit-argument (not arg)))
 
 (provide 'vertigo)
 ;;; vertigo.el ends here
