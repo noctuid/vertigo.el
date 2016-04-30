@@ -9,6 +9,8 @@ The main difference from using [[https://github.com/abo-abo/avy][avy]] is that y
 ** Setting the Digit Argument
 Since the vim vertigo plugin basically just provided an alternate way to set the count for =j= and =k=, I thought it might be nice to generalize this behavior to set the count for any command. Vertigo provides ~vertigo-set-digit-argument~, which allows setting the digit argument using vertigo's configured home row keys. With the universal argument (or any argument), it will set the prefix argument for the next command to a negative number instead. ~vertigo-set-negative-digit-argument~ has the opposite behavior, defaulting to a negative argument.
 
+There is also ~vertigo-run-command-with-digit-argument~ (suggested/created by [[https://github.com/danieloosthuizen][Daniel Oosthuizen]]) which could be considered to be the reverse of ~vertigo-set-digit-argument~. First the user types the keys for the desired command, and then vertigo will prompt for keys to determine the digit argument. There is an alternate version, ~vertigo-alt-run-command-with-digit-argument~, that will display a message afterwards showing the keys run and digit argument used (e.g. "gk 5"). The main difference to the user is that this command requires that =M-[0-9]= be mapped to ~digit-argument~, which is the case by default. I could probably do something ugly with ~set-transient-map~ to ensure this command worked even if the user had remapped these keys, but I'd rather not.
+
 ** Evil Motions
 Vertigo currently has no evil related functionality or dependency. However, if you wanted to use vertigo commands with operators, it is quite simple to make a motion:
 #+begin_src emacs-lisp

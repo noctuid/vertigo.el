@@ -67,33 +67,37 @@ immediately jump. Setting it to 10 will make no keys immediately jump."
   :group 'vertigo
   :type 'integer)
 
-
-(defun vertigo--jump (jump-function prompt)
+(defun vertigo--jump (jump-function prompt &optional no-message)
   "Helper function to be used for jumps in either direction.
-JUMP-FUNCTION is the function to be used. PROMPT is the prompt to to display
-when asking users to input keys and after the jump."
+Return the chosen number. JUMP-FUNCTION is the function to be used. PROMPT is
+the prompt to display when asking users to input keys and after the jump. When
+NO-MESSAGE is non-nil, don't message with the prompt and chosen number
+afterwards."
   (let* ((immediate-jump-chars (-drop vertigo-cut-off vertigo-home-row))
          (delayed-jump-chars (-take vertigo-cut-off vertigo-home-row))
          (first-char (read-char prompt))
          (immediate-index (-elem-index first-char immediate-jump-chars))
-         (delayed-index (-elem-index first-char delayed-jump-chars)))
+         (delayed-index (-elem-index first-char delayed-jump-chars))
+         jump-lines)
     (if immediate-index
-        (funcall jump-function (+ immediate-index vertigo-cut-off 1))
+        (setq jump-lines (+ immediate-index vertigo-cut-off 1))
       (when delayed-index
         (let* ((second-char (read-char
                              (concat prompt
                                      (number-to-string (1+ delayed-index)))))
-               (final-index (-elem-index second-char vertigo-home-row))
-               (jump-lines
+               (final-index (-elem-index second-char vertigo-home-row)))
+          (setq jump-lines
                 (when final-index
                   (string-to-number
                    (concat (number-to-string (1+ delayed-index))
                            (number-to-string (if (= final-index 9)
                                                  0
-                                               (1+ final-index))))))))
-          (when jump-lines
-            (funcall jump-function jump-lines)
-            (message (concat prompt (number-to-string jump-lines) " --"))))))))
+                                               (1+ final-index))))))))))
+    (when jump-lines
+      (funcall jump-function jump-lines)
+      (unless no-message
+        (message (concat prompt (number-to-string jump-lines) " --")))
+      jump-lines)))
 
 ;;;###autoload
 (defun vertigo-jump-down ()
@@ -147,6 +151,34 @@ If ARG is non-nil, set a negative count."
   (if arg
       (vertigo--jump #'vertigo--set-negative-digit-argument "Set digit arg: ")
     (vertigo--jump #'vertigo--set-digit-argument "Set digit arg: ")))
+
+;;;###autoload
+(defun vertigo-run-command-with-digit-argument (command-keys)
+  "Like `vertigo-set-digit-argument', but the command is chosen first.
+After keys have been pressed that correspond to a command, vertigo will prompt
+to set the digit argument for that command and then run it."
+  (interactive "k")
+  ;; this will ensure the prompt is displayed
+  (message "")
+  (let ((times (number-to-string (vertigo--jump #'vertigo--set-digit-argument
+                                                "Set digit arg: "
+                                                t))))
+    (setq unread-command-events (listify-key-sequence command-keys))
+    ;; this will be clobbered
+    (message (concat command-keys " " times))))
+
+;;;###autoload
+(defun vertigo-alt-run-command-with-digit-argument (command-keys)
+  "Like `vertigo-run-command-with-digit-agument' but properly messages.
+A message showing the command and the prefix arg will be displayed in the
+echo area afterwards. M-[0-9] must be mapped to `digit-argument' for this
+command to work correctly."
+  (interactive "k")
+  (message "")
+  (let ((times (number-to-string
+                (vertigo--jump (lambda (_)) "Set digit arg: " t))))
+    (execute-kbd-macro (kbd (concat "M-" times " " command-keys)))
+    (message (concat command-keys " " times))))
 
 ;;;###autoload
 (defun vertigo-set-negative-digit-argument (arg)
