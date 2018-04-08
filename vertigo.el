@@ -48,7 +48,7 @@
 (defgroup vertigo nil
   "Gives commands for moving by lines using the home row."
   :group 'convenience
-  :prefix 'vertigo)
+  :prefix "vertigo-")
 
 (defcustom vertigo-home-row
   '(?a ?s ?d ?f ?g ?h ?j ?k ?l ?\;)
