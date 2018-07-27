@@ -43,3 +43,7 @@ For non-QWERTY users, ~vertigo-home-row~ can be changed:
 #+end_src
 
 Since it is inefficient to use these commands to jump one or two lines, vertigo can take a second key as input for some keys. For example, pressing =aa= would jump 11 lines and pressing =a;= would jump 10. To control the max home row key where 2 keys are input, ~vertigo-cut-off~ can be set. It defaults to 3, meaning that 39 lines can be jumped at maximum. Pressing =d(key2)= will jump 30 something lines, but pressing =f= will immediately jump 4 lines.
+
+~vertigo-max-digits~ can be configured to change the maximum number of digits that can be input. It defaults to two. If you want to use vertigo with commands where a count could be 100 or more, you can increase the value. ~vertigo-cut-off~ only has an effect when ~vertigo-max-digits~ is two.
+
+Regardless of the values of ~vertigo-cut-off~ and ~vertigo-max-digits~, pressing a capital letter from ~vertigo-home-row~ will immediately end the number (e.g. pressing =A= by default will correspond to the number 1).

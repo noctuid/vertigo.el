@@ -52,88 +52,96 @@
 
 (defcustom vertigo-home-row
   '(?a ?s ?d ?f ?g ?h ?j ?k ?l ?\;)
-  "10 chars corresponding to the home row keys."
+  "10 chars corresponding to the home row keys (or the numbers 1-9 and 0)."
   :group 'vertigo
   :type '(repeat char))
 
-(defcustom vertigo-cut-off
-  3
+(defcustom vertigo-cut-off 3
   "This determines boundary key for whether one or two keys should be input.
 For example, with the default value of 3, 39 lines at max can be jumped. The
 third key in `vertigo-home-row' will jump 30 something lines (depending on the
 second keypress). On the other hand, pressing the fourth key will jump down 4
 lines without further user input. Setting this value to 0 will make all keys
-immediately jump. Setting it to 10 will make no keys immediately jump."
+immediately jump. Setting it to 10 will make no keys immediately jump. Note that
+this variable only has an effect when `vertigo-max-digits' is 2. Regardless of
+the value of these variables, an inputting an uppercase letter will immediately
+end the number (e.g. by default, inputting \"A\" corresponds to 1)."
   :group 'vertigo
   :type 'integer)
 
-(defun vertigo--jump (jump-function prompt &optional no-message)
-  "Helper function to be used for jumps in either direction.
-Return the chosen number. JUMP-FUNCTION is the function to be used. PROMPT is
-the prompt to display when asking users to input keys and after the jump. When
+(defcustom vertigo-max-digits 2
+  "The max number of digits that can be specified with vertigo commands.
+The default value is 2, meaning that the max number that can be specified is
+99."
+  :group 'vertigo
+  :type 'integer)
+
+(defun vertigo--lower-p (char)
+  "Return whether CHAR is lowercase."
+  (= char (downcase char)))
+
+(cl-defun vertigo--run (function prompt &optional no-message)
+  "Call FUNCTION with a count determined by user-input characters.
+PROMPT is the prompt to display when asking users to input keys and calling FUNCTION. When
 NO-MESSAGE is non-nil, don't message with the prompt and chosen number
-afterwards."
-  (let* ((immediate-jump-chars (-drop vertigo-cut-off vertigo-home-row))
-         (delayed-jump-chars (-take vertigo-cut-off vertigo-home-row))
-         (first-char (read-char prompt))
-         (immediate-index (-elem-index first-char immediate-jump-chars))
-         (delayed-index (-elem-index first-char delayed-jump-chars))
-         jump-lines)
-    (if immediate-index
-        (setq jump-lines (+ immediate-index vertigo-cut-off 1))
-      (when delayed-index
-        (let* ((second-char (read-char
-                             (concat prompt
-                                     (number-to-string (1+ delayed-index)))))
-               (final-index (-elem-index second-char vertigo-home-row)))
-          (setq jump-lines
-                (when final-index
-                  (string-to-number
-                   (concat (number-to-string (1+ delayed-index))
-                           (number-to-string (if (= final-index 9)
-                                                 0
-                                               (1+ final-index))))))))))
-    (when jump-lines
-      (funcall jump-function jump-lines)
+afterward calling FUNCTION."
+  (let ((num-digits 1)
+        (immediate-end-chars (-drop vertigo-cut-off vertigo-home-row))
+        current-num-str)
+    (while (let* ((char (read-char (concat prompt current-num-str)))
+                  (index (or (-elem-index (downcase char) vertigo-home-row)
+                             (cl-return-from vertigo--run 0)))
+                  (num (if (= index 9)
+                           0
+                         (1+ index)))
+                  (endp (or (= num-digits vertigo-max-digits)
+                            (not (vertigo--lower-p char))
+                            (and (= vertigo-max-digits 2)
+                                 (memq (downcase char) immediate-end-chars)))))
+             (cl-incf num-digits)
+             (setq current-num-str (concat current-num-str (number-to-string num)))
+             (not endp)))
+    (let ((final-num (string-to-number current-num-str)))
+      (funcall function final-num)
       (unless no-message
-        (message (concat prompt (number-to-string jump-lines) " --")))
-      jump-lines)))
+        (message (concat prompt current-num-str " --")))
+      final-num)))
 
 ;;;###autoload
 (defun vertigo-jump-down ()
   "Jump down a number of lines using the home row keys."
   (interactive)
-  (vertigo--jump #'forward-line "Jump down: "))
+  (vertigo--run #'forward-line "Jump down: "))
 
 ;;;###autoload
 (defun vertigo-jump-up ()
   "Jump up a number of lines using the home row keys."
   (interactive)
-  (vertigo--jump (lambda (count) (forward-line (- count))) "Jump up: "))
+  (vertigo--run (lambda (count) (forward-line (- count))) "Jump up: "))
 
 ;;;###autoload
 (defun vertigo-visible-jump-down ()
   "Jump down a number of visible lines using the home row keys."
   (interactive)
-  (vertigo--jump #'forward-visible-line "Jump down: "))
+  (vertigo--run #'forward-visible-line "Jump down: "))
 
 ;;;###autoload
 (defun vertigo-visible-jump-up ()
   "Jump up a number of visible lines using the home row keys."
   (interactive)
-  (vertigo--jump (lambda (count) (forward-visible-line (- count))) "Jump up: "))
+  (vertigo--run (lambda (count) (forward-visible-line (- count))) "Jump up: "))
 
 ;;;###autoload
 (defun vertigo-visual-jump-down ()
   "Jump down a number of visual lines using the home row keys."
   (interactive)
-  (vertigo--jump #'next-line "Jump down: "))
+  (vertigo--run #'next-line "Jump down: "))
 
 ;;;###autoload
 (defun vertigo-visual-jump-up ()
   "Jump up a number of visual lines using the home row keys."
   (interactive)
-  (vertigo--jump #'previous-line "Jump up: "))
+  (vertigo--run #'previous-line "Jump up: "))
 
 (defun vertigo--set-digit-argument (num)
   "A simpler version of `set-digit-argument'; set `prefix-arg' to NUM."
@@ -149,8 +157,8 @@ afterwards."
 If ARG is non-nil, set a negative count."
   (interactive "P")
   (if arg
-      (vertigo--jump #'vertigo--set-negative-digit-argument "Set digit arg: ")
-    (vertigo--jump #'vertigo--set-digit-argument "Set digit arg: ")))
+      (vertigo--run #'vertigo--set-negative-digit-argument "Set digit arg: ")
+    (vertigo--run #'vertigo--set-digit-argument "Set digit arg: ")))
 
 ;;;###autoload
 (defun vertigo-run-command-with-digit-argument (command-keys)
@@ -160,9 +168,9 @@ to set the digit argument for that command and then run it."
   (interactive "k")
   ;; this will ensure the prompt is displayed
   (message "")
-  (let ((times (number-to-string (vertigo--jump #'vertigo--set-digit-argument
-                                                "Set digit arg: "
-                                                t))))
+  (let ((times (number-to-string (vertigo--run #'vertigo--set-digit-argument
+                                               "Set digit arg: "
+                                               t))))
     (setq unread-command-events (listify-key-sequence command-keys))
     ;; this will be clobbered
     (message (concat command-keys " " times))))
@@ -176,7 +184,7 @@ command to work correctly."
   (interactive "k")
   (message "")
   (let ((times (number-to-string
-                (vertigo--jump (lambda (_)) "Set digit arg: " t))))
+                (vertigo--run (lambda (_)) "Set digit arg: " t))))
     (execute-kbd-macro (kbd (concat "M-" times " " command-keys)))
     (message (concat command-keys " " times))))
 
