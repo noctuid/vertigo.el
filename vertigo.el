@@ -66,14 +66,12 @@ immediately jump. Setting it to 10 will make no keys immediately jump. Note that
 this variable only has an effect when `vertigo-max-digits' is 2. Regardless of
 the value of these variables, inputting an uppercase letter will immediately
 end the number (e.g. by default, inputting \"A\" corresponds to 1)."
-  :group 'vertigo
   :type 'integer)
 
 (defcustom vertigo-max-digits 2
   "The max number of digits that can be specified with vertigo commands.
 The default value is 2, meaning that the max number that can be specified is
 99."
-  :group 'vertigo
   :type 'integer)
 
 (defun vertigo--lower-p (char)
