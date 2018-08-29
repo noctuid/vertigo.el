@@ -64,7 +64,7 @@ second keypress). On the other hand, pressing the fourth key will jump down 4
 lines without further user input. Setting this value to 0 will make all keys
 immediately jump. Setting it to 10 will make no keys immediately jump. Note that
 this variable only has an effect when `vertigo-max-digits' is 2. Regardless of
-the value of these variables, an inputting an uppercase letter will immediately
+the value of these variables, inputting an uppercase letter will immediately
 end the number (e.g. by default, inputting \"A\" corresponds to 1)."
   :group 'vertigo
   :type 'integer)
