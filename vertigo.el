@@ -44,6 +44,7 @@
 
 ;;; Code:
 (require 'dash)
+(require 'cl-lib)
 
 (defgroup vertigo nil
   "Gives commands for moving by lines using the home row."
